@@ -1,54 +1,41 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-lg">
       <div>
         <h2 class="text-center text-3xl font-bold text-gray-900">Crear Cuenta</h2>
         <p class="mt-2 text-center text-sm text-gray-600">Regístrate con tu correo y contraseña</p>
       </div>
 
-      <form @submit.prevent="checkForm" class="space-y-6">
+      <form @submit.prevent="checkForm" method="post" class="space-y-6">
         <!-- Email -->
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Correo</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
+          <input id="email" v-model="email" type="email"
             :class="['mt-1 block w-full px-4 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition', emailError ? 'border-red-500' : 'border-gray-300']"
-            placeholder="tu@email.com"
-          />
+            placeholder="tu@email.com" />
         </div>
 
         <!-- Password -->
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
+          <input id="password" v-model="password" type="password"
             :class="['mt-1 block w-full px-4 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition', passwordError ? 'border-red-500' : 'border-gray-300']"
-            placeholder="••••••••"
-          />
+            placeholder="••••••••" />
         </div>
 
         <!-- Confirm Password -->
         <div>
           <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
-          <input
-            id="confirm-password"
-            v-model="confirmPassword"
-            type="password"
+          <input id="confirm-password" v-model="confirmPassword" type="password"
             :class="['mt-1 block w-full px-4 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition', confirmPasswordError ? 'border-red-500' : 'border-gray-300']"
-            placeholder="••••••••"
-          />
+            placeholder="••••••••" />
         </div>
 
         <!-- Submit Button -->
         <div>
-          <button
-            type="submit"
-            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
-          >
+          <button type="submit"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
             Registrar
           </button>
         </div>
@@ -74,7 +61,7 @@
 <script>
 export default {
   name: "RegisterView",
-  
+
   // Datos reactivos
   data() {
     return {
@@ -107,7 +94,7 @@ export default {
           ? "Error: Todos los campos son obligatorios."
           : (!this.email ? "Error: El Email no puede estar vacío."
             : !this.password ? "Error: La Contraseña no puede estar vacía."
-            : "Error: Debes confirmar la contraseña.");
+              : "Error: Debes confirmar la contraseña.");
 
         setTimeout(() => this.errorMessage = "", 3000);
         return;
@@ -135,7 +122,11 @@ export default {
         // Manejar respuesta
         if (res.ok) {
           this.successMessage = json.message || "Registro correcto";
-          setTimeout(() => this.successMessage = "", 3000);
+          // Navegar a home después de un breve retraso
+          setTimeout(() => {
+            this.successMessage = ""
+            this.$router.push({ name: 'home' });
+          }, 500);
         } else {
           this.errorMessage = json.error || json.message || "Error al registrar";
           setTimeout(() => this.errorMessage = "", 3000);

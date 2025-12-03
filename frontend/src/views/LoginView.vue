@@ -7,18 +7,18 @@
         <p class="mt-2 text-center text-sm text-gray-600">Ingresa tus credenciales</p>
       </div>
 
-      <form @submit.prevent="checkForm" action="" method="post" class="space-y-6">
+      <form @submit.prevent="checkForm" class="space-y-6">
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Correo</label>
           <input id="email" v-model="email" type="email" name="email"
-            :class="{ 'mt-1 block w-full px-4 py-2 border border-red-500 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition': emailError, 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition': !emailError }"
+            :class="['mt-1 block w-full px-4 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition', emailError ? 'border-red-500' : 'border-gray-300']"
             placeholder="tu@email.com" />
         </div>
 
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
           <input id="password" v-model="password" type="password" name="password"
-            :class="{ 'mt-1 block w-full px-4 py-2 border border-red-500 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition': passwordError, 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition': !passwordError }"
+            :class="['mt-1 block w-full px-4 py-2 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 outline-none transition', passwordError ? 'border-red-500' : 'border-gray-300']"
             placeholder="••••••••" />
         </div>
 
@@ -52,7 +52,7 @@
 
 export default {
   name: "HomeView",
-  
+
   // Datos reactivos
   data() {
     return {
@@ -101,7 +101,13 @@ export default {
       if (res.ok) {
         this.successMessage = json.message || "Ingreso correcto";
         if (json.token) localStorage.setItem("token", json.token);
-        setTimeout(() => this.successMessage = "", 3000);
+
+        // Navegar a home después de un breve retraso
+          setTimeout(() => {
+            this.successMessage = ""
+            this.$router.push({name: 'home'});
+          }, 500);
+        
       } else {
         this.errorMessage = json.message || "Error al iniciar sesión";
         setTimeout(() => this.errorMessage = "", 3000);

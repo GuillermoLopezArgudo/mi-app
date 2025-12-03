@@ -9,4 +9,4 @@ class BaseModel(Model):
 # Modelo de usuario
 class Usuario(BaseModel):
     email = CharField(unique=True)
-    password = CharField()
+    password = CharField(max_length=128)

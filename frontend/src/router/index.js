@@ -6,6 +6,11 @@ import HomeView from '@/views/HomeView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // Redirigir la ruta raíz a la vista de inicio de sesión
+    {
+      path: '/',
+      redirect: '/login',
+    },
     // Ruta para la vista de inicio de sesión
     {
       path: '/login',
@@ -20,7 +25,7 @@ const router = createRouter({
     },
     // Ruta para la vista principal después del inicio de sesión
     {
-      path: '/',
+      path: '/home',
       name: 'home',
       component: HomeView,
     },

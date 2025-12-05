@@ -105,7 +105,7 @@ export default {
         // Navegar a home después de un breve retraso
           setTimeout(() => {
             this.successMessage = ""
-            this.$router.push({name: 'home'});
+            this.$router.push('/home');
           }, 500);
         
       } else {

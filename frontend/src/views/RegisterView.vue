@@ -122,10 +122,10 @@ export default {
         // Manejar respuesta
         if (res.ok) {
           this.successMessage = json.message || "Registro correcto";
-          // Navegar a home después de un breve retraso
+          // Navegar a login después de un breve retraso
           setTimeout(() => {
             this.successMessage = ""
-            this.$router.push({ name: 'home' });
+            this.$router.push('/login');
           }, 500);
         } else {
           this.errorMessage = json.error || json.message || "Error al registrar";

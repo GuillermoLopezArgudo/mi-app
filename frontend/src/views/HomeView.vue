@@ -36,6 +36,8 @@ onMounted(() => {
     const token = localStorage.getItem('token');
     if (!token) {
         router.push('/login');
+    }else{
+        getCards();
     }
 });
 
@@ -45,14 +47,82 @@ function reciveModal(valor) {
 
     //  Agregar nueva tarjeta si los datos son válidos
     if (valor && valor.title && valor.description) {
-        cards.value.push({
+        const newCard = {
             title: valor.title,
             description: valor.description,
             image: valor.imageUrl || "",
             link: "#"
-        });
+        };
+
+        cards.value.push(newCard);
+        addCard(newCard);  
     }
 }
+
+// Función para agregar una nueva tarjeta al backend
+async function addCard(card) {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch("http://localhost:5000/api/cards", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        title: card.title,
+        description: card.description,
+        urlimage: card.image
+      })
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      console.error("Error:", json.error || json.message || "Error al enviar card");
+    } else {
+      console.log("Card creada exitosamente");
+    }
+  } catch (err) {
+    console.error("Error de conexión:", err);
+  }
+}
+
+// Función para obtener las tarjetas desde el backend
+async function getCards() {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    console.error("No hay token, inicia sesión primero.");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/api/cards", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const json = await res.json();
+
+    if (res.ok) {
+      cards.value = json.cards.map(card => ({
+        title: card.title,
+        description: card.description,
+        image: card.urlimage,
+        link: "#"
+      }));
+    } else {
+      console.error("Error:", json.error || json.message);
+    }
+  } catch (err) {
+    console.error("Error de conexión:", err);
+  }
+}
+
+
 
 </script>
 

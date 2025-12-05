@@ -1,6 +1,7 @@
 from app import create_app
 from app.extensions import db
-from app.models.usuario import Usuario
+from app.models.user import User
+from app.models.cards import Card
 import logging
 import time
 
@@ -26,11 +27,13 @@ with app.app_context():
         logging.error("No se pudo conectar a MySQL después de varios intentos.")
         exit(1)
 
-    # Asignar la base de datos al modelo Usuario
-    Usuario._meta.database = db.db
+    # Asignar la base de datos a los modelos
+    User._meta.database = db.db
+    Card._meta.database = db.db
 
     try:
-        db.db.create_tables([Usuario])
+        db.db.create_tables([User])
+        db.db.create_tables([Card])
         logging.info("Tablas creadas correctamente.")
     except Exception as e:
         logging.error(f"Error al crear tablas: {e}")

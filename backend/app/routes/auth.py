@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models.usuario import Usuario
+from app.models.user import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import logging
@@ -21,20 +21,20 @@ def register_user():
         return jsonify({"error": "Faltan datos. Proporciona email y contraseña."}), 400
 
     # Verificar si el usuario ya existe
-    if Usuario.select().where(Usuario.email == email).exists():
+    if User.select().where(User.email == email).exists():
         return jsonify({"error": "El usuario ya existe."}), 400
 
     try:
         # Cifrar la contraseña
-        password_hashed  =  generate_password_hash(data.get("password"))
+        password_hashed = generate_password_hash(password_plain, method='pbkdf2:sha256', salt_length=8)
         
         # Crear el usuario en la base de datos
-        usuario = Usuario.create(email=email, password=password_hashed)
+        user = User.create(email=email, password=password_hashed)
         
         # Generar token JWT
         payload = {
-            "user_id": usuario.id,
-            "email": usuario.email,
+            "user_id": user.id,
+            "email": user.email,
             "exp": datetime.utcnow() + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -42,7 +42,7 @@ def register_user():
         return jsonify({
             "ok": True,
             "message": "Usuario registrado exitosamente",
-            "usuario": {"email": usuario.email},
+            "usuario": {"email": user.email},
             "token": token
         }), 201
     except Exception as e:
@@ -58,17 +58,17 @@ def login():
     
  # Buscar usuario por email
     try:
-        usuario = Usuario.get(Usuario.email == email)
-    except Usuario.DoesNotExist:
+        user = User.get(User.email == email)
+    except User.DoesNotExist:
         return jsonify({"ok": False, "message": "Credenciales inválidas"}), 401
 
     # Verificar contraseña
-    if check_password_hash(usuario.password, password):
+    if check_password_hash(user.password, password):
         
         # Generar token JWT
         payload = {
-            "user_id": usuario.id,
-            "email": usuario.email,
+            "user_id": user.id,
+            "email": user.email,
             "exp": datetime.utcnow() + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")

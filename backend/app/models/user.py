@@ -7,6 +7,6 @@ class BaseModel(Model):
         database = db.db
 
 # Modelo de usuario
-class Usuario(BaseModel):
+class User(BaseModel):
     email = CharField(unique=True)
     password = CharField(max_length=128)

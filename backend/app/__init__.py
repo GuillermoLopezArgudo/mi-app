@@ -4,6 +4,7 @@ from .config import Config
 from .extensions import db
 from .routes.main import main_bp
 from .routes.auth import auth_bp
+from .routes.cards import cards_bp
 
 # Crear la aplicacion Flask
 def create_app():
@@ -18,5 +19,6 @@ def create_app():
     # Registrar Blueprints
     app.register_blueprint(main_bp, url_prefix="/api")
     app.register_blueprint(auth_bp, url_prefix="/api")
+    app.register_blueprint(cards_bp, url_prefix="/api")
 
     return app

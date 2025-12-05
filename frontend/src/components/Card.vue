@@ -4,6 +4,7 @@
       class="w-full h-48 object-cover"
       :src="image"
       :alt="title"
+      loading="lazy"
     />
     <div class="p-4">
       <h2 class="text-xl font-bold mb-1">{{title}}</h2>

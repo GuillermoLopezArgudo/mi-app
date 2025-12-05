@@ -11,8 +11,7 @@
                     class="w-full mb-3 p-2 border border-gray-300 rounded" v-model="title" />
                 <textarea placeholder="Descripción de la clase" class="w-full mb-3 p-2 border border-gray-300 rounded"
                     v-model="description"></textarea>
-                <input type="text" placeholder="URL de la imagen" class="w-full mb-3 p-2 border border-gray-300 rounded"
-                    v-model="imageUrl" />
+                <input type="file" @change="onFileChange" class="w-full mb-3 p-2 border border-gray-300 rounded" />
             </slot>
             <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" @click="submitModal">
                 Enviar
@@ -24,21 +23,29 @@
 <script setup>
 
 import { ref } from 'vue';
+
 // Definición de las props del componente
 defineProps({
     open: Boolean,
 })
+
 // Definición de los eventos emitidos por el componente
 const emit = defineEmits(['close']);
 
 const title = ref('');
 const description = ref('');
-const imageUrl = ref('');
+const selectedFile = ref(null);
+
+// Capturar el archivo seleccionado
+function onFileChange(event) {
+    const file = event.target.files[0];
+    if (file) selectedFile.value = file;
+}
 
 // Función para enviar datos al componente padre
 function submitModal() {
 
-   emit('close', { title: title.value, description: description.value, imageUrl: imageUrl.value });
+   emit('close', { title: title.value, description: description.value, file: selectedFile.value });
     resetFields();
 }
 
@@ -52,7 +59,7 @@ function closeModal() {
 function resetFields() {
     title.value = '';
     description.value = '';
-    imageUrl.value = '';
+    selectedFile.value = '';
 }
 
 </script>

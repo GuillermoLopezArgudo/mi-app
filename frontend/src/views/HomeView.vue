@@ -3,11 +3,11 @@
         <Navbar></Navbar>
         <button @click="showModal = true" class="m-4 p-2 bg-indigo-600 text-white rounded">Añadir Clase</button>
         <div class="min-h-screen bg-gray-50 py-8 px-4">
-            <h1 class="text-3xl font-bold mb-8 text-gray-900 text-center">Nuestros Cafés</h1>
+            <h1 class="text-3xl font-bold mb-8 text-gray-900 text-center">Nuestros Cards</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto" id="a">
                 <!-- Renderizar las tarjetas de café -->
-                <Card v-for="(card, index) in cards" :key="index" :title="card.title" :description="card.description"
-                    :image="card.image" :link="card.link" />
+                <Card v-for="card in cards" :key="card.id" :id="card.id" :title="card.title" :description="card.description"
+                    :image="card.image" :link="card.link"  @deleted="deletedCard"/>
             </div>
         </div>
         <Modal :open="showModal" @close="reciveModal"></Modal>
@@ -111,6 +111,7 @@ async function getCards() {
 
         if (res.ok) {
             cards.value = json.cards.map(card => ({
+                id: card.id,
                 title: card.title,
                 description: card.description,
                 image: card.urlimage ? `${BASE_URL}${card.urlimage}` : `${BASE_URL}/static/images/clase1.jpg`,
@@ -124,6 +125,27 @@ async function getCards() {
     }
 }
 
+// Función para eliminar una tarjeta
+async function deletedCard(valor) {
+    try {
+        const res = await fetch(`${BASE_URL}/api/cards/${valor.id}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (!res.ok) {
+            console.error("Error eliminando card");
+            return;
+        }
+
+        cards.value = cards.value.filter(c => c.id !== valor.id);
+        
+    } catch (error) {
+        console.error("Error de conexión", error);
+    }
+}
 
 
 </script>

@@ -56,6 +56,7 @@ def create_card():
             "ok": True,
             "message": "Card creada",
             "card": {
+                "id": card.id,
                 "title": card.title,
                 "description": card.description,
                 "urlimage": card.urlimage
@@ -84,7 +85,36 @@ def get_cards():
 
     cards = Card.select().where(Card.user == user)
     cards_list = [
-        {"title": c.title, "description": c.description, "urlimage": c.urlimage}
+        {"id":c.id,"title": c.title, "description": c.description, "urlimage": c.urlimage}
         for c in cards
     ]
     return jsonify({"cards": cards_list}), 200
+
+# Eliminar una card por su ID
+@cards_bp.delete("/cards/<int:card_id>")
+def delete_card(card_id):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Token no proporcionado"}), 401
+
+    try:
+        token = auth_header.split()[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user = User.get_by_id(payload["user_id"])
+    except User.DoesNotExist:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Token inválido"}), 401
+
+    try:
+        card = Card.get_by_id(card_id)
+        if card.user.id != user.id:
+            return jsonify({"error": "No autorizado para eliminar esta card"}), 403
+        card.delete_instance()
+        return jsonify({"ok": True, "message": "Card eliminada"}), 200
+    except Card.DoesNotExist:
+        return jsonify({"error": "Card no encontrada"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

@@ -46,6 +46,7 @@ function reciveModal(valor) {
             title: valor.title,
             description: valor.description,
             file: valor.file,
+            image: `${BASE_URL}/static/images/clase1.jpg`,
             link: "#"
         };
 

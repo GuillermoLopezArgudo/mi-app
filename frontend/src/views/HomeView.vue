@@ -63,7 +63,7 @@ async function addCard(card) {
         formData.append("description", card.description);
         if (card.file) formData.append("image", card.file);
 
-        const res = await fetch("http://localhost:5000/api/cards", {
+        const res = await fetch(`${BASE_URL}/api/cards`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${token}`

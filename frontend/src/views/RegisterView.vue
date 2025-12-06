@@ -72,7 +72,8 @@ export default {
       passwordError: false,
       confirmPasswordError: false,
       errorMessage: "",
-      successMessage: ""
+      successMessage: "",
+      BASE_URL: "http://localhost:5000"
     };
   },
   methods: {
@@ -111,7 +112,7 @@ export default {
 
       // Enviar datos al backend
       try {
-        const res = await fetch("http://localhost:5000/api/register", {
+        const res = await fetch(`${this.BASE_URL}/api/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: this.email, password: this.password })

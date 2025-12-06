@@ -48,8 +48,9 @@ function deletedClass() {
   emit('deleted',{ id: props.id});
 }
 
+// Función para editar la tarjeta
 function editeClass() {
-  emit('edited');
+  emit('edited',{ id: props.id});
 }
 
 </script>

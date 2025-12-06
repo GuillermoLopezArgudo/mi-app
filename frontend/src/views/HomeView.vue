@@ -6,11 +6,12 @@
             <h1 class="text-3xl font-bold mb-8 text-gray-900 text-center">Nuestros Cards</h1>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto" id="a">
                 <!-- Renderizar las tarjetas de café -->
-                <Card v-for="card in cards" :key="card.id" :id="card.id" :title="card.title" :description="card.description"
-                    :image="card.image" :link="card.link"  @deleted="deletedCard"/>
+                <Card v-for="card in cards" :key="card.id" :id="card.id" :title="card.title"
+                    :description="card.description" :image="card.image" :link="card.link" @deleted="deletedCard"
+                    @edited="editedCard" />
             </div>
         </div>
-        <Modal :open="showModal" @close="reciveModal"></Modal>
+        <Modal :open="showModal" :edit="editCard" @close="reciveModal"></Modal>
     </div>
 </template>
 
@@ -25,6 +26,7 @@ const router = useRouter();
 const cards = ref([]);
 const showModal = ref(false)
 const BASE_URL = "http://localhost:5000";
+const editCard = ref(null);
 
 // Verificar token al montar el componente
 onMounted(() => {
@@ -40,8 +42,21 @@ onMounted(() => {
 function reciveModal(valor) {
     showModal.value = false;
 
-    //  Agregar nueva tarjeta si los datos son válidos
-    if (valor && valor.title && valor.description) {
+    if (!valor) return;
+
+    // Si se está editando una tarjeta existente
+    if (editCard.value) {
+
+        Object.assign(editCard.value, {
+            title: valor.title,
+            description: valor.description,
+            file: valor.file,
+        });
+        updateCardBackend(editCard.value);
+        editCard.value = null;
+        // Si se está creando una nueva tarjeta
+    } else if (valor.title && valor.description) {
+
         const newCard = {
             title: valor.title,
             description: valor.description,
@@ -49,7 +64,6 @@ function reciveModal(valor) {
             image: `${BASE_URL}/static/images/clase1.jpg`,
             link: "#"
         };
-
         cards.value.push(newCard);
         addCard(newCard);
     }
@@ -142,12 +156,53 @@ async function deletedCard(valor) {
         }
 
         cards.value = cards.value.filter(c => c.id !== valor.id);
-        
+
     } catch (error) {
         console.error("Error de conexión", error);
     }
 }
 
+// Función para editar una tarjeta
+function editedCard(valor) {
+    const cardToEdit = cards.value.find(c => c.id === valor.id);
+    if (cardToEdit) {
+        editCard.value = cardToEdit;
+        showModal.value = true;
+    }
+}
+
+// Función para actualizar una tarjeta en el backend
+async function updateCardBackend(card) {
+    try {
+        const token = localStorage.getItem("token");
+        const formData = new FormData();
+        formData.append("title", card.title);
+        formData.append("description", card.description);
+        if (card.file) formData.append("image", card.file);
+
+        const res = await fetch(`${BASE_URL}/api/cards/${card.id}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) {
+            console.error("Error actualizando card:", json.error || json.message);
+        } else {
+            console.log("Card actualizada exitosamente");
+            if (json.card.urlimage) {
+                const index = cards.value.findIndex(c => c.id === card.id);
+                if (index !== -1) cards.value[index].image = `${BASE_URL}${json.card.urlimage}`;
+            }
+        }
+    } catch (err) {
+        console.error("Error de conexión al actualizar card:", err);
+    }
+}
 
 </script>
 

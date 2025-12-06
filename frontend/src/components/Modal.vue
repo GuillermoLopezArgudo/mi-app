@@ -22,11 +22,12 @@
 
 <script setup>
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 // Definición de las props del componente
-defineProps({
+const { open, edit } = defineProps({
     open: Boolean,
+    edit: Object
 })
 
 // Definición de los eventos emitidos por el componente
@@ -36,6 +37,14 @@ const title = ref('');
 const description = ref('');
 const selectedFile = ref(null);
 
+// Rellenar los campos si se recibe un objeto de edición
+watch(() => edit, (newEdit) => {
+    if (newEdit) {
+        title.value = newEdit.title || '';
+        description.value = newEdit.description || '';
+    }
+}, { immediate: true });
+
 // Capturar el archivo seleccionado
 function onFileChange(event) {
     const file = event.target.files[0];
@@ -44,7 +53,6 @@ function onFileChange(event) {
 
 // Función para enviar datos al componente padre
 function submitModal() {
-
    emit('close', { title: title.value, description: description.value, file: selectedFile.value });
     resetFields();
 }

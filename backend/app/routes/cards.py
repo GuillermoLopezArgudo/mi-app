@@ -118,3 +118,57 @@ def delete_card(card_id):
         return jsonify({"error": "Card no encontrada"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Actualizar una card por su ID
+@cards_bp.put("/cards/<int:card_id>")
+def update_card(card_id):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header:
+        return jsonify({"error": "Token no proporcionado"}), 401
+
+    try:
+        token = auth_header.split()[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user = User.get_by_id(payload["user_id"])
+    except User.DoesNotExist:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Token inválido"}), 401
+
+    # Obtener datos desde FormData
+    title = request.form.get("title")
+    description = request.form.get("description")
+    file = request.files.get("image")
+
+    try:
+        card = Card.get_by_id(card_id)
+        if card.user.id != user.id:
+            return jsonify({"error": "No autorizado para actualizar esta card"}), 403
+
+        if title:
+            card.title = title
+        if description:
+            card.description = description
+        if file:
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(filepath)
+            card.urlimage = f"/static/images/{filename}"
+
+        card.save()
+        return jsonify({
+            "ok": True,
+            "message": "Card actualizada",
+            "card": {
+                "id": card.id,
+                "title": card.title,
+                "description": card.description,
+                "urlimage": card.urlimage
+            }
+        }), 200
+    except Card.DoesNotExist:
+        return jsonify({"error": "Card no encontrada"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

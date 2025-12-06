@@ -137,7 +137,6 @@ def update_card(card_id):
     except jwt.InvalidTokenError:
         return jsonify({"error": "Token inválido"}), 401
 
-    # Obtener datos desde FormData
     title = request.form.get("title")
     description = request.form.get("description")
     file = request.files.get("image")

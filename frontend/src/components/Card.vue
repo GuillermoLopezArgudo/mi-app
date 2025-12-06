@@ -30,7 +30,7 @@ const props = defineProps({
   title: { type: String, required: true },
   description: { type: String, required: true },
   image: { type: String, default: "" },
-  link: { type: String, default: null }
+  link: { type: String, default: "" }
 })
 
 const router = useRouter();

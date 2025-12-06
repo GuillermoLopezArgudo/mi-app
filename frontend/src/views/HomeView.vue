@@ -31,6 +31,7 @@ const editCard = ref(null);
 // Verificar token al montar el componente
 onMounted(() => {
     const token = localStorage.getItem('token');
+
     if (!token) {
         router.push('/login');
     } else {
@@ -62,7 +63,7 @@ function reciveModal(valor) {
             description: valor.description,
             file: valor.file,
             image: `${BASE_URL}/static/images/clase1.jpg`,
-            link: "#"
+            link: 'notebook'
         };
         cards.value.push(newCard);
         addCard(newCard);
